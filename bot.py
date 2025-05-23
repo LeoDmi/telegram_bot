@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 import openai
 import os
 
-API_TOKEN = os.getenv("API_TOKEN")
+API_TOKEN = os.getenv("API_TOKEN", "").strip()
 try:
     ADMIN_ID = int(os.getenv("ADMIN_ID", "0").strip().lstrip("="))
 except ValueError:
