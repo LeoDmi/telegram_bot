@@ -5,7 +5,7 @@ from aiogram.types import Message
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.default import DefaultBotProperties
 import aiosqlite
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import openai
@@ -48,7 +48,7 @@ async def log_message(message: Message):
     async with aiosqlite.connect(db_file) as db:
         await db.execute(
             'INSERT INTO messages (chat_id, chat_title, user_id, user_name, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
-            (message.chat.id, chat_title, message.from_user.id, display_name, message.text, datetime.utcnow())
+            (message.chat.id, chat_title, message.from_user.id, display_name, message.text, datetime.now(UTC))
         )
         await db.commit()
 
@@ -86,7 +86,7 @@ async def send_daily_report():
     await bot.send_message(chat_id=ADMIN_ID, text=report)
 
 async def build_report():
-    start_time = datetime.utcnow() - timedelta(hours=24)
+    start_time = datetime.now(UTC) - timedelta(hours=24)
     async with aiosqlite.connect(db_file) as db:
         response_times = {}
         async with db.execute('SELECT chat_id, user_id, user_name, timestamp FROM messages WHERE timestamp > ? ORDER BY chat_id, timestamp', (start_time,)) as cursor:
@@ -108,7 +108,7 @@ async def build_report():
                 last_msg_time[chat_id] = timestamp
 
         hanging_chats = set()
-        six_hours_ago = datetime.utcnow() - timedelta(hours=6)
+        six_hours_ago = datetime.now(UTC) - timedelta(hours=6)
         async with db.execute('''SELECT chat_id, chat_title, user_id, user_name, MAX(timestamp) FROM messages
                                  WHERE timestamp > ? GROUP BY chat_id''', (start_time,)) as cursor:
             for row in await cursor.fetchall():
