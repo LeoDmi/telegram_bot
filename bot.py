@@ -9,20 +9,19 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-# Загружаем переменные окружения
+# 🔐 Переменные окружения
 API_TOKEN = os.getenv("API_TOKEN", "").strip()
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0").strip().lstrip("="))
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "").strip()
 
-# Настройка OpenAI
 openai.api_key = OPENAI_API_KEY
 
-# Настройка Telegram-бота
+# 🤖 Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=MemoryStorage())
 
-# Обработка команды /analyze
+# 🔁 Команда /analyze
 @dp.message(F.text.startswith("/analyze"))
 async def handle_analyze(message: Message):
     if message.from_user.id != ADMIN_ID:
@@ -30,23 +29,23 @@ async def handle_analyze(message: Message):
         return
     await message.reply("📊 Анализ будет доступен в webhook-версии позже")
 
-# Установка webhook при запуске
-async def on_startup(*, dispatcher: Dispatcher, bot: Bot):
-    await bot.set_webhook(WEBHOOK_URL)
+# 🚀 Установка webhook (через dispatcher)
+async def on_startup(*, dispatcher: Dispatcher):
+    await dispatcher.bot.set_webhook(WEBHOOK_URL)
     print("🚀 Webhook установлен")
 
-# Удаление webhook при остановке
-async def on_shutdown(*, dispatcher: Dispatcher, bot: Bot):
-    await bot.delete_webhook()
+# 🛑 Удаление webhook
+async def on_shutdown(*, dispatcher: Dispatcher):
+    await dispatcher.bot.delete_webhook()
     print("🛑 Webhook удалён")
 
-# Основной запуск aiohttp-сервера
+# 🌐 Основной запуск aiohttp-сервера
 async def main():
     app = web.Application()
+
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
-    # Интеграция webhook с aiohttp
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path="/webhook")
     setup_application(app, dp)
 
