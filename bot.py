@@ -160,4 +160,4 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        print('Бот остановлен.')[содержимое последней версии кода из Canvas будет вставлено здесь вручную]
+        print('Бот остановлен.')
