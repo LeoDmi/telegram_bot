@@ -11,13 +11,13 @@ API_TOKEN = os.getenv("API_TOKEN", "").strip()
 ADMIN_ID = os.getenv("ADMIN_ID", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 
-# 🛡 Проверка
+# 🛡 Проверка на наличие токенов
 if not API_TOKEN or not ADMIN_ID:
-    raise ValueError("❌ Не заданы переменные API_TOKEN или ADMIN_ID")
+    raise ValueError("❌ Переменные API_TOKEN или ADMIN_ID не заданы!")
 
 ADMIN_ID = int(ADMIN_ID.lstrip("="))
 
-# 🤖 Инициализация бота
+# 🤖 Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=MemoryStorage())
 
@@ -27,13 +27,14 @@ async def handle_analyze(message: Message):
     if message.from_user.id != ADMIN_ID:
         await message.reply("⛔ Только руководитель может запускать анализ.")
         return
-    await message.reply("📊 Анализ включится позже — бот работает через polling.")
+    await message.reply("📊 Анализ пока не реализован — бот работает через polling.")
 
-# ▶️ Запуск polling
+# ▶️ Функция запуска polling
 async def main():
-    print("⚡ Running polling...")
-    await dp.start_polling(bot)
+    print("⚡ Running polling...")         # ← Твой запрос
+    await dp.start_polling(bot)           # ← Запуск polling
 
+# ⏯ Точка входа
 if __name__ == "__main__":
     try:
         asyncio.run(main())
