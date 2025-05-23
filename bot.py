@@ -44,7 +44,6 @@ async def main():
     app = web.Application()
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
-    dp.include_router(dp)
     app.router.add_post("/webhook", dp.webhook_handler(bot))
     runner = web.AppRunner(app)
     await runner.setup()
