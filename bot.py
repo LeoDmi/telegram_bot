@@ -12,7 +12,11 @@ import openai
 import os
 
 API_TOKEN = os.getenv("API_TOKEN")
-ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+try:
+    ADMIN_ID = int(os.getenv("ADMIN_ID", "0").strip().lstrip("="))
+except ValueError:
+    print("❌ Ошибка: переменная ADMIN_ID указана некорректно.")
+    ADMIN_ID = 0
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai.api_key = OPENAI_API_KEY
 
